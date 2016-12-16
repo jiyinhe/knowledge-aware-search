@@ -1,0 +1,11 @@
+el: scripts to run Yahoo Fast Enitity Linking
+
+el/download_WP.sh: download the current WP collection
+
+el/fel_datapack.sh: mind WP and build the datapack with entity counts
+
+el/fel_hash.sh: create the hash for entity linking
+
+el/fel_linking.sh: script to entity linking for given input files.
+	- the format of the input files: each line contains query_id \t query_text
+
