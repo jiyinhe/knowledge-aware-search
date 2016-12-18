@@ -1,0 +1,21 @@
+Scripts used to preprocess the logs
+
+- Each log has a different format and different parculiarity, 
+ so a dedicated script is used to format and prepare the log. 
+
+- The final output file is in json format
+{'uid': userid (either exact or proximated, or leave as "U")
+ 'qid': querid that is unique within a single user, for example, composed of uid + timestamp
+ 'qtext': query text,
+ 'urls': [(url1, timestamp, rank), (url2 ..], clicked urls
+ 'qtype': query type: [new|page|na] whether it's a new query or a pagination, or not known
+ 'qtime': timestamp of the query
+ 'qel': entity linking result of the query
+}
+
+
+
+run.py: run the scripts to pre-process the logs
+
+slogs/aol.py: class to process the AOL log 
+
