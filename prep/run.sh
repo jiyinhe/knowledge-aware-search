@@ -33,17 +33,40 @@ fi
 
 # first clean the outputdir if it exists
 hdfs dfs -rm -r $output
-if [ -e $output_local ]; then
-	rm -r $output_local
-fi
+
+if [[ ${phase} == '3' ]];
+then
+# phase 3
+input_phase1_local=${output_localdir}/output_${log}_phase1
+input_phase2_local=${output_localdir}/output_${log}_el
+input_phase3_dir=tmp_input_${log}_phase3/
+
+hdfs dfs -mkdir ${input_phase3_dir}
+hdfs dfs -put ${input_phase1_local} ${input_phase3_dir}
+hdfs dfs -put ${input_phase2_local} ${input_phase3_dir}
 
 hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
--jobconf mapred.reduce.tasks=20
+-D mapred.reduce.tasks=100 \
+-files logParser.py \
+-mapper "logParser.py ${log} map -p ${phase}" \
+-reducer "logParser.py ${log} reduce -p ${phase}" \
+-input /user/he/$input_phase3_dir/*/* -output /user/he/$output \
+
+else 
+# phase 1, 2
+hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
+-D mapred.reduce.tasks=100 \
 -files logParser.py \
 -mapper "logParser.py ${log} map -p ${phase}" \
 -reducer "logParser.py ${log} reduce -p ${phase}" \
 -input /user/he/$input -output /user/he/$output \
--jobconf mapred.reduce.tasks=100 
+
+fi
+
+# get the results
+if [ -e $output_local ]; then
+	rm -r $output_local
+fi
 
 hdfs dfs -get $output $output_local
 

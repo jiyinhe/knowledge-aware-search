@@ -142,10 +142,11 @@ class AOLParser(Parser):
     def map_phase3(self, record):
         record = list(record)
         # check from which file the record comes from
-        if len(record) == 3:
-            # from phase 1: counter, key, json object
-            counter, key, content = record
-            print '%s\t%s'%(key, content)
+        if len(record) == 4:
+            # from phase 1: counter, key, phase1, json object
+#            counter, key, phase, content = record
+#            print '%s\t%s\t%s'%(key, phase, content)
+            print '\t'.join(record[1:])
         elif len(record) == 9:
             # from result of entity linking:
             counter, key, etype, query, intentpart, et, score, flag1, flag2 = record 
@@ -170,7 +171,7 @@ class AOLParser(Parser):
             # remove temporary field url
             entry.pop('url')
             # print entry
-            print '%s\t%s'%(key, js.dumps(entry))
+            print '%s\t%s\t%s'%(key, 'phase1', js.dumps(entry))
 
     def reduce_phase2(self, data):
         for key, group in it.groupby(data, lambda x: x[0]):
@@ -184,12 +185,14 @@ class AOLParser(Parser):
             item = {}
             entities = []
             group = list(group)
+
             for g in group:
-                # from enetity linking
-                if 'entity' in g[1]:
-                    entities.append(js.loads(g[1]))
-                elif 'qid' in g[1]:
+                fields = g[1].split('\t')
+                if fields[0] == 'phase1':
                     item = js.loads(g[1])
+                else:
+                # from enetity linking
+                    entities.append(js.loads(g[1]))
             # add entities
             item['entities'] = entities
             # order the clicked urls with the original sequence
