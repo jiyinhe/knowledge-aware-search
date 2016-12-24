@@ -142,11 +142,10 @@ class AOLParser(Parser):
     def map_phase3(self, record):
         record = list(record)
         # check from which file the record comes from
-        if len(record) == 4:
+        if len(record) == 3:
             # from phase 1: counter, key, phase1, json object
-#            counter, key, phase, content = record
-#            print '%s\t%s\t%s'%(key, phase, content)
-            print '\t'.join(record[1:])
+            counter, key, content = record
+            print '%s\t%s'%(key, content)
         elif len(record) == 9:
             # from result of entity linking:
             counter, key, etype, query, intentpart, et, score, flag1, flag2 = record 
@@ -168,10 +167,11 @@ class AOLParser(Parser):
                 entry = js.loads(g[1])
                 urls.append(entry['url'])
             entry['urls'] = urls
+            entry['phase'] = 1
             # remove temporary field url
             entry.pop('url')
             # print entry
-            print '%s\t%s\t%s'%(key, 'phase1', js.dumps(entry))
+            print '%s\t%s'%(key, js.dumps(entry))
 
     def reduce_phase2(self, data):
         for key, group in it.groupby(data, lambda x: x[0]):
@@ -184,23 +184,15 @@ class AOLParser(Parser):
         for key, group in it.groupby(data, lambda x: x[0]):
             entities = []
             item = {}
-            group = list(group)
-
-            for g in group:
-                fields = g[1].split('\t')
-                if fields[0] == 'phase1':
-                    item = js.loads(fields[1])
-                else:
+            for k, v in group:
+                value = js.loads(v)
+                if 'phase' in value:
+                    item = value
+                elif 'entity' in value:
                 # from enetity linking
-                    entities.append(js.loads(g[1]))
+                    entities.append(value)
             # add entities
             item['entities'] = entities
-            # order the clicked urls with the original sequence
-            #try:
-            #    item['urls'] = sorted(item['urls'], key=lambda x: x[0])
-            #except KeyError:
-            #    print "Error: phase 1 result missing:", group
-            #    sys.exit()
             print js.dumps(item)
  
 
