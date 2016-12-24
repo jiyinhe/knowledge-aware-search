@@ -18,33 +18,19 @@ timestamp
  'qel': entity linking result of the query
 }
 """
+# An abstract class
+class Parser (object):
 
-class AOLParser(object):
-    # Format of AOL: AnonID Query QueryTime ItemRank ClickURL
-    # Each line in the data represents one of two types of events:
-    #    1. A query that was NOT followed by the user clicking on a result item.
-    #    2. A click through on an item in the result list returned from a query.
-    #In the first case (query only) there is data in only the first three columns/fields
-    #-- namely AnonID, Query, and QueryTime (see above). 
-    #In the second case (click through), there is data in all five columns.  For click
-    #through events, the query that preceded the click through is included.  Note that if
-    #a user clicked on more than one result in the list returned from a single query,
-    #there will be TWO lines in the data to represent the two events.  Also note that if
-    #the user requested the next "page" or results for some query, this appears as a
-    #subsequent identical query with a later time stamp.
-    def __init__(self):
-        self.counter = 0
-
-    def read_input(self, file):
+    def read_input(self, file, ignoresign=None, delimiter='\t'):
         for line in file:
             self.counter += 1
-            if line.startswith('AnonID'):
+            if ignoresign and line.startswith(ignoresign):
                 continue
-            yield [self.counter] + line.strip().split('\t')
+            yield [self.counter] + line.strip().split(delimiter)
         
-    def read_mapper_output(self, file):
+    def read_mapper_output(self, file, delimiter='\t'):
         for line in file:
-            yield line.strip().rsplit('\t', 1)
+            yield line.strip().rsplit(delimiter, 1)
 
     def map(self, phase=1): 
         records = self.read_input(sys.stdin)
@@ -64,7 +50,31 @@ class AOLParser(object):
             self.reduce_phase2(data)
         elif phase == 3:
             self.reduce_phase3(data)
-        
+    
+    def map_phase1(self, record): pass 
+    def map_phase2(self, record): pass 
+    def map_phase3(self, record): pass 
+
+    def reduce_phase1(self, data): pass
+    def reduce_phase2(self, data): pass
+    def reduce_phase3(self, data): pass
+
+class AOLParser(Parser):
+    # Format of AOL: AnonID Query QueryTime ItemRank ClickURL
+    # Each line in the data represents one of two types of events:
+    #    1. A query that was NOT followed by the user clicking on a result item.
+    #    2. A click through on an item in the result list returned from a query.
+    #In the first case (query only) there is data in only the first three columns/fields
+    #-- namely AnonID, Query, and QueryTime (see above). 
+    #In the second case (click through), there is data in all five columns.  For click
+    #through events, the query that preceded the click through is included.  Note that if
+    #a user clicked on more than one result in the list returned from a single query,
+    #there will be TWO lines in the data to represent the two events.  Also note that if
+    #the user requested the next "page" or results for some query, this appears as a
+    #subsequent identical query with a later time stamp.
+    def __init__(self):
+        self.counter = 0
+
     def map_phase1(self, record):
         i = 0
         key, value = [], {}
