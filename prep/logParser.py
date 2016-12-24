@@ -135,6 +135,15 @@ class AOLParser(Parser):
         value = record[2]
         print '%s\t%s'%(key, value)
 
+    # Input comes from either phase1 or phase2 output
+    # each line of phase1 output: key, tab, json object
+    # each line of phase2 output contains tab seperated fields:
+    # key, 
+    def map_phase3(record):
+        # check from which file the record comes from
+        print len(record) 
+
+
     def reduce_phase1(self, data):
         for key, group in it.groupby(data, lambda x: x[0]):
             urls = []

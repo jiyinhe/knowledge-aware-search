@@ -38,11 +38,11 @@ if [ -e $output_local ]; then
 fi
 
 hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
+-jobconf mapred.reduce.tasks=20
 -files logParser.py \
 -mapper "logParser.py ${log} map -p ${phase}" \
 -reducer "logParser.py ${log} reduce -p ${phase}" \
 -input /user/he/$input -output /user/he/$output
-
 
 hdfs dfs -get $output $output_local
 
