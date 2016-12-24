@@ -91,6 +91,9 @@ class AOLParser(Parser):
         self.ignore = 'AnonID'
         self.delimiter = '\t'
 
+    # Input is the original log, line by line, splitted
+    # over fields, this function process one line
+    # counter AnonID Query QueryTime ItemRank ClickURL
     def map_phase1(self, record):
         i = 0
         key, value = [], {}
@@ -122,6 +125,16 @@ class AOLParser(Parser):
         k = '-'.join(key)
         print '%s\t%s'%(k, v)
 
+    # Input is the original log, line by line splitted over 
+    # fields. This function process one line
+    # counter AnonID Query QueryTime ItemRank ClickURL
+    def map_phase2(self, record):
+        i = 0
+        record = list(record)
+        key = '-'.join(record[1:4])
+        value = record[2]
+        print '%s\t%s'%(key, value)
+
     def reduce_phase1(self, data):
         for key, group in it.groupby(data, lambda x: x[0]):
             urls = []
@@ -135,6 +148,11 @@ class AOLParser(Parser):
             entry.pop('url')
             # print entry
             print '%s\t%s'%(key, js.dumps(entry))
+
+    def reduce_phase2(self, data):
+        for key, group in it.groupby(data, lambda x: x[0]):
+            g = list(group)
+            print '%s\t%s'%(key, g[0][1])
 
     class Factory:
         def create(self): return AOLParser()
