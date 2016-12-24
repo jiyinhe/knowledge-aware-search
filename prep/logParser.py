@@ -139,9 +139,23 @@ class AOLParser(Parser):
     # each line of phase1 output: key, tab, json object
     # each line of phase2 output contains tab seperated fields:
     # key, 
-    def map_phase3(record):
+    def map_phase3(self, record):
+        record = list(record)
         # check from which file the record comes from
-        print len(record) 
+        if len(record) == 3:
+            # from phase 1: counter, key, json object
+            counter, key, content = record
+            print '%s\t%s'%(key, content)
+        elif len(record) == 9:
+            # from result of entity linking:
+            counter, key, etype, query, intentpart, et, score, flag1, flag2 = record 
+            value = {
+                'entity': et, 
+                'intent': intentpart,
+                'score': score,
+                'flag': flag1,
+            } 
+            print '%s\t%s'%(key, js.dumps(value))
 
 
     def reduce_phase1(self, data):
@@ -162,6 +176,30 @@ class AOLParser(Parser):
         for key, group in it.groupby(data, lambda x: x[0]):
             g = list(group)
             print '%s\t%s'%(key, g[0][1])
+
+    def reduce_phase3(self, data):
+        # all entries in a group is about a query (key)
+        # either from the log or from the entity linking output
+        for key, group in it.groupby(data, lambda x: x[0]):
+            item = {}
+            entities = []
+            group = list(group)
+            for g in group:
+                # from enetity linking
+                if 'entity' in g[1]:
+                    entities.append(js.loads(g[1]))
+                elif 'qid' in g[1]:
+                    item = js.loads(g[1])
+            # add entities
+            item['entities'] = entities
+            # order the clicked urls with the original sequence
+            try:
+                item['urls'] = sorted(item['urls'], key=lambda x: x[0])
+            except KeyError:
+                print "Error: phase 1 result missing:", item
+                sys.exit()
+            print js.dumps(item)
+ 
 
     class Factory:
         def create(self): return AOLParser()
