@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import sys
 import simplejson as js
@@ -62,7 +64,12 @@ class AOLParser(object):
             if i>0 and i < 4:
                 key.append(item)
             elif i == 4:
-                url[1] = int(item)
+                # Try to convert the rank to int
+                try:
+                    url[1] = int(item)
+                except ValueError:
+                    # If not successful then mark it
+                    url[1] = -1
             elif i == 5:
                 url[2] = item
             i += 1
