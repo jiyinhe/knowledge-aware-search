@@ -182,25 +182,25 @@ class AOLParser(Parser):
         # all entries in a group is about a query (key)
         # either from the log or from the entity linking output
         for key, group in it.groupby(data, lambda x: x[0]):
-            item = {}
             entities = []
+            item = {}
             group = list(group)
 
             for g in group:
                 fields = g[1].split('\t')
                 if fields[0] == 'phase1':
-                    item = js.loads(g[1])
+                    item = js.loads(fields[1])
                 else:
                 # from enetity linking
                     entities.append(js.loads(g[1]))
             # add entities
             item['entities'] = entities
             # order the clicked urls with the original sequence
-            try:
-                item['urls'] = sorted(item['urls'], key=lambda x: x[0])
-            except KeyError:
-                print "Error: phase 1 result missing:", item
-                sys.exit()
+            #try:
+            #    item['urls'] = sorted(item['urls'], key=lambda x: x[0])
+            #except KeyError:
+            #    print "Error: phase 1 result missing:", group
+            #    sys.exit()
             print js.dumps(item)
  
 
