@@ -30,13 +30,17 @@ class ParserFactory:
 
 # An abstract class
 class Parser (object):
+    def __init__(self):
+        self.counter = 0
+        self.ignore = None
+        self.delimiter = '\t'
 
-    def read_input(self, file, ignoresign=None, delimiter='\t'):
+    def read_input(self, file):
         for line in file:
             self.counter += 1
-            if ignoresign and line.startswith(ignoresign):
+            if line.startswith(self.ignore):
                 continue
-            yield [self.counter] + line.strip().split(delimiter)
+            yield [self.counter] + line.strip().split(self.delimiter)
         
     def read_mapper_output(self, file, delimiter='\t'):
         for line in file:
@@ -52,8 +56,8 @@ class Parser (object):
             elif phase == 3:
                 self.map_phase3(record)         
 
-    def reduce(self, phase):
-        data = self.read_mapper_output(sys.stdin)
+    def reduce(self, phase=1, delimiter='\t'):
+        data = self.read_mapper_output(sys.stdin, delimiter)
         if phase == 1:
             self.reduce_phase1(data)
         elif phase == 2:
@@ -84,6 +88,8 @@ class AOLParser(Parser):
     #subsequent identical query with a later time stamp.
     def __init__(self):
         self.counter = 0
+        self.ignore = 'AnonID'
+        self.delimiter = '\t'
 
     def map_phase1(self, record):
         i = 0
@@ -160,11 +166,11 @@ following logs: AOL, KB.')
     # Make parser
     parser = ParserFactory.createParser(args.get('log') + 'Parser')
     action = args.get('action')
-    phase = int(args.get('phase', 1))    
+    phase = int(args.get('phase', 1))
     
     if parser and action:
         if action == 'map':
-            parser.map(phase)        
+            parser.map(phase)  
         elif action == 'reduce':
             parser.reduce(phase)
     
