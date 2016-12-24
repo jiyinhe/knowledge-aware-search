@@ -18,6 +18,7 @@ timestamp
  'qel': entity linking result of the query
 }
 """
+class Parser(object):
 
 class AOLParser(object):
     # Format of AOL: AnonID Query QueryTime ItemRank ClickURL
@@ -42,20 +43,32 @@ class AOLParser(object):
                 continue
             yield [self.counter] + line.strip().split('\t')
         
+    def read_mapper_output(self, file):
+        for line in file:
+            yield line.strip().rsplit('\t', 1)
+
     def map(self, phase=1): 
         records = self.read_input(sys.stdin)
         for record in records:
             if phase == 1:
                 self.map_phase1(record)
             elif phase == 2:
-                self.map_phase2()
+                self.map_phase2(record)
             elif phase == 3:
-                self.map_phase3()              
+                self.map_phase3(record)         
 
+    def reduce(self, phase):
+        data = self.read_mapper_output(sys.stdin)
+        if phase = 1:
+            self.reduce_phase1(data)
+        elif phase = 2:
+            self.reduce_phase2(data)
+        elif phase = 3:
+            self.reduce_phase3(data)
+        
     def map_phase1(self, record):
         i = 0
-        key = []
-        value = {}
+        key, value = [], {}
         counter = -1 
         url = [counter, '', '']
         for item in record:
@@ -84,12 +97,7 @@ class AOLParser(object):
         k = '-'.join(key)
         print '%s\t%s'%(k, v)
 
-    def read_mapper_output(self, file):
-        for line in file:
-            yield line.strip().rsplit('\t', 1)
-
-    def reduce(self, phase):
-        data = self.read_mapper_output(sys.stdin)
+    def reduce_phase1(self, data)
         for key, group in it.groupby(data, lambda x: x[0]):
             urls = []
             entry = {}
