@@ -18,6 +18,16 @@ timestamp
  'qel': entity linking result of the query
 }
 """
+# A parser factory for different logs
+class ParserFactory:
+    factories = {}
+    def createParser(parsername):
+        if not ParserFactory.factories.has_key(parsername):
+            ParserFactory.factories[parsername] = \
+                eval(parsername + '.Factory()')
+        return ParserFactory.factories[parsername].create()
+    createParser = staticmethod(createParser)
+
 # An abstract class
 class Parser (object):
 
@@ -120,10 +130,11 @@ class AOLParser(Parser):
             # print entry
             print '%s\t%s'%(key, js.dumps(entry))
 
+    class Factory:
+        def create(self): return AOLParser()
+
 class KBParser(object):
     pass
-
-
 
 
 
@@ -147,10 +158,7 @@ following logs: AOL, KB.')
 
     args = vars(argparser.parse_args())
     # Make parser
-    parser = None
-    if args.get('log') == 'AOL':
-        parser = AOLParser()
-    
+    parser = ParserFactory.createParser(args.get('log') + 'Parser')
     action = args.get('action')
     phase = int(args.get('phase', 1))    
     
