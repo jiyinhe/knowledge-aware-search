@@ -41,7 +41,8 @@ hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
 -files logParser.py \
 -mapper "logParser.py ${log} map -p ${phase}" \
 -reducer "logParser.py ${log} reduce -p ${phase}" \
--input /user/he/$input -output /user/he/$output
+-input /user/he/$input -output /user/he/$output \
+-jobconf mapred.reduce.tasks=100 
 
 
 hdfs dfs -get $output $output_local

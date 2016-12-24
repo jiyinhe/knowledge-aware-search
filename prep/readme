@@ -15,7 +15,7 @@ Scripts used to preprocess the logs
 
 
 
-run.py: run the scripts to pre-process the logs
+run.sh: run the scripts to pre-process the logs
+run_el.sh: run the script to run fast entity linking
 
-slogs/aol.py: class to process the AOL log 
 
