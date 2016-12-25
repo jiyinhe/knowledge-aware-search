@@ -193,6 +193,7 @@ class AOLParser(Parser):
                     entities.append(value)
             # add entities
             item['entities'] = entities
+            item['phase'] = 3
             print js.dumps(item)
  
 
