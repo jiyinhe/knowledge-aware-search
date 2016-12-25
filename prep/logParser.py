@@ -54,7 +54,9 @@ class Parser (object):
             elif phase == 2:
                 self.map_phase2(record)
             elif phase == 3:
-                self.map_phase3(record)         
+                self.map_phase3(record)
+            elif phase == 4:
+                self.map_phase4(record)
 
     def reduce(self, phase=1, delimiter='\t'):
         data = self.read_mapper_output(sys.stdin, delimiter)
@@ -64,14 +66,19 @@ class Parser (object):
             self.reduce_phase2(data)
         elif phase == 3:
             self.reduce_phase3(data)
+        elif phase == 4:
+            self.reduce_phase4(data)
     
     def map_phase1(self, record): pass 
     def map_phase2(self, record): pass 
     def map_phase3(self, record): pass 
+    def map_phase4(self, record): pass 
+
 
     def reduce_phase1(self, data): pass
     def reduce_phase2(self, data): pass
     def reduce_phase3(self, data): pass
+    def reduce_phase4(self, data): pass
 
 class AOLParser(Parser):
     # Format of AOL: AnonID Query QueryTime ItemRank ClickURL
@@ -150,13 +157,21 @@ class AOLParser(Parser):
             # from result of entity linking:
             counter, key, etype, query, intentpart, et, score, flag1, flag2 = record 
             value = {
-                'entity': et, 
-                'intent': intentpart,
-                'score': score,
-                'flag': flag1,
+                'entity': et.strip(), 
+                'intent': intentpart.strip(),
+                'score': float(score.strip()),
+                'flag': flag1.strip(),
             } 
             print '%s\t%s'%(key, js.dumps(value))
 
+    # input is output of phase3, each line contains: counter, json object
+    # about a query, the goal of phase4 is to group the json objects
+    # by user id
+    def map_phase4(self, record):
+        counter, json = record
+        item = js.loads(json) 
+        k = item['uid']
+        print '%s\t%s'%(k, js.dumps(item))
 
     def reduce_phase1(self, data):
         for key, group in it.groupby(data, lambda x: x[0]):
@@ -195,7 +210,19 @@ class AOLParser(Parser):
             item['entities'] = entities
             print js.dumps(item)
  
-
+    def reduce_phase4(self, data):
+        # group input by key (userid)
+        for key, group in it.groupby(data, lambda x: x[0]):
+            item = {}
+            item['uid'] = key
+            eles = []
+            for k, g in group:
+                json = js.loads(g)
+                json.pop('uid')
+                eles.append(json)
+            item['queries'] = eles
+            print item    
+        
     class Factory:
         def create(self): return AOLParser()
 
@@ -215,11 +242,12 @@ following logs: AOL, KB.')
     argparser.add_argument('action', type=str, 
                     help='choose between "map" and "reduce"')
 
-    argparser.add_argument('-p', '--phase', default=1, choices='123', 
-                    help='Choose the processing phase (1, 2, or 3), default is 1.\n \
+    argparser.add_argument('-p', '--phase', default=1, choices='1234',
+                    help='Choose the processing phase (1, 2, 3, 4), default is 1.\n \
                     #phase 1: parse the log and extract information needed for the final format;\n \
                     #phase 2: parse the log and format it for entity linking;\n \
                     #phase 3: collect results from phase 1 and 2, and format the final result;\n \
+                    #phase 4: group output from phase 3 with userid \
                     ')
 
     args = vars(argparser.parse_args())
