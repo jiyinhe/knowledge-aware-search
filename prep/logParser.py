@@ -222,7 +222,7 @@ class AOLParser(Parser):
                 json.pop('uid')
                 eles.append(json)
             item['queries'] = eles
-            print item    
+            print js.dumps(item)   
         
     class Factory:
         def create(self): return AOLParser()
