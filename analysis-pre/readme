@@ -1,0 +1,28 @@
+Analysis of the logs pre- modelling and predictions
+Purpose:
+- descriptive stats of data
+- sanity check of the hypotheses over user search patterns
+
+
+Descriptive stats:
+
+1. navigational queries - navigational queries are not good for our purpose:
+-- # and % (non) navigational queries
+-- mean, sd over user: # and % non-nav queries 
+-- % user: # and % non-nav queries > threshold x
+
+2. entities (threshold -3)
+-- % non navigational queries linked with entities  
+-- mean, sd over user: % non-nav queries linked with entities 
+-- % user: % non-nav queries linked with entities > threshold x
+
+3. change of mind - queries
+-- find sequences of queries that share same words but are not identical 
+
+4. change of mind - urls
+-- find sequences of queries that are identical but with different clicked results
+-- Note: assume that consecutive identical queries are from pagination 
+
+5. change of mind - entities
+-- find sequences of queries that share the same linked entity but different intent
+parts
