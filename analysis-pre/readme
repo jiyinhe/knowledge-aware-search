@@ -6,7 +6,9 @@ Purpose:
 
 Descriptive stats:
 
-1. navigational queries - navigational queries are not good for our purpose:
+1. navigation  - navigational queries are not good for our purpose:
+We cannot identify all navigational queries, instead, we only identify those that are
+direct url inputs.
 -- # and % (non) navigational queries
 -- mean, sd over user: # and % non-nav queries 
 -- % user: # and % non-nav queries > threshold x
