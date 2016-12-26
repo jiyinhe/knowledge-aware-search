@@ -6,11 +6,12 @@ Analyse logs from a user session.
 
 """
 import sys
-import os
-sys.path.insert(0, os.path.abspath('../'))
+#import os
+#sys.path.insert(0, os.path.abspath('../'))
 from datetime import datetime
 import itertools as it
-from utils import QueryNormalizer as qn
+#from utils 
+import QueryNormalizer as qn
 
 class UserAnalyzer(object):
     def __init__(self, data, entity_threshold=-3):

@@ -5,11 +5,12 @@ Compute the dsecriptive stats per user
 """
 import sys
 import os
-sys.path.insert(0, os.path.abspath('../'))
+#sys.path.insert(0, os.path.abspath('../'))
 
 import simplejson as js
 import argparse
-from analyzer import UserAnalyzer as ua
+#from analyzer 
+import UserAnalyzer as ua
 
 def read_input(file):
     for line in file:
