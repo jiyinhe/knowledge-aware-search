@@ -39,9 +39,9 @@ class Parser (object):
         for line in file:
             self.counter += 1
             if line.startswith(self.ignore):
-                continue
+               continue
             yield [self.counter] + line.strip().split(self.delimiter)
-        
+ 
     def read_mapper_output(self, file, delimiter='\t'):
         for line in file:
             yield line.strip().rsplit(delimiter, 1)

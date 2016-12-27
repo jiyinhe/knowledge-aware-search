@@ -18,4 +18,4 @@ Scripts used to preprocess the logs
 run.sh: run the scripts to pre-process the logs
 run_el.sh: run the script to run fast entity linking
 
-
+run_wpclicks.sh: run the scripts to compute transition probabilities of WP clicks
