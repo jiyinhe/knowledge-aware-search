@@ -60,6 +60,10 @@ class WPClicks(object):
                 print 'key\t%s'%(count)
             elif stats == 'sta':
                 print '%s\t%s'%(c2, count)
+            elif stats == 'tra':
+                # Only consider within WP transition
+                if not c1.startswith('other'):
+                    print '%s\t%s\t%s'%(c1, c2, count)
 
     def reduce(self, stats, totcount=None):
         data = self.read_mapper_output(sys.stdin)
@@ -71,7 +75,15 @@ class WPClicks(object):
                 counts = sum([int(g[1]) for g in group])
                 prob = float(counts)/totcount
                 print '%s\t%s\t%s'%(c2, counts, prob) 
-                
+        elif stats == 'tra':
+            for c1, group in it.groupby(data, lambda x: x[0]):
+                group = list(group)
+                sum_c1 = sum([int(g[2]) for g in group]) 
+                entries = [{g[1]:[int(g[2]), float(g[2])/sum_c1]}
+                        for g in group
+                    ]
+                print '%s\t%s'%(c1, js.dumps(entries))
+ 
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='This script computes \

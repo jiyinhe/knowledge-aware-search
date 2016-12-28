@@ -24,7 +24,7 @@ do
 
 	# Find total counts of clicks if computing stationary probability
 	if [[ $stats == 'sta' ]]; then
-		tot=``cat ${outputdir}/${date}_tot/*''	
+		tot=`cat ${output_localdir}/${date}_tot/*`	
 	fi
 
 	hdfs dfs -rm -r $output
