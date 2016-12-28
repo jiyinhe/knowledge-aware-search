@@ -14,8 +14,29 @@ Scripts used to preprocess the logs
 }
 
 
+logParser.py: 
+	python script to parse the logs and prepare for further processing, e.g. run FEL tool
+	It contains 4 stages:
+	- phase1: extract info needed for final output
+	- phase2: extract queries for FEL
+	- phase3: combine results of phase1 and 2
+	- phase4: group log by user
+run_logparser.sh: 
+	to run the logParser script to pre-process the logs
+run_el.sh: 
+	to run the script to run fast entity linking
 
-run.sh: run the scripts to pre-process the logs
-run_el.sh: run the script to run fast entity linking
+WPClick.py: 
+	python script to compute stats of WP click data
+	It has 3 modes:
+	- tot: compute the total number of clicks of "curr" concepts
+	- sta: stationary probability of "curr" concept being reached, using tot as a parameter
+	- tra: transitional probability from "prev" to "curr" P(curr|prev).
+run_wpclicks.sh: 
+	to run the WPClick.py with all click data included.
+run_wpclicks_perfile.sh: 
+	to run the WPClick.py wich individual WP click data dump.
 
-run_wpclicks.sh: run the scripts to compute transition probabilities of WP clicks
+
+
+
