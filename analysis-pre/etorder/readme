@@ -1,0 +1,6 @@
+Purpose of analysis:
+- check if there is a correlation between the order of entities occuring in user queries and that ooccur in WPclick stream 
+
+Parameter setup:
+- threshold of entities in queries: -3
+ 

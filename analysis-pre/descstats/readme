@@ -3,6 +3,10 @@ Purpose:
 - descriptive stats of data
 - sanity check of the hypotheses over user search patterns
 
+Note: to run hadoop stream with multpile python scripts:
+all scripts need to be physically under the same directory, e.g. in "app/"
+
+
 
 Descriptive stats:
 
