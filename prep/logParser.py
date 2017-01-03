@@ -57,6 +57,9 @@ class Parser (object):
                 self.map_phase3(record)
             elif phase == 4:
                 self.map_phase4(record)
+            elif phase == 5:
+                self.map_phase5(record)
+
 
     def reduce(self, phase=1, delimiter='\t'):
         data = self.read_mapper_output(sys.stdin, delimiter)
@@ -68,17 +71,23 @@ class Parser (object):
             self.reduce_phase3(data)
         elif phase == 4:
             self.reduce_phase4(data)
+        elif phase == 5:
+            self.reduce_phase5(data)
     
     def map_phase1(self, record): pass 
     def map_phase2(self, record): pass 
     def map_phase3(self, record): pass 
     def map_phase4(self, record): pass 
+    def map_phase5(self, record): pass 
+
 
 
     def reduce_phase1(self, data): pass
     def reduce_phase2(self, data): pass
     def reduce_phase3(self, data): pass
     def reduce_phase4(self, data): pass
+    def reduce_phase5(self, data): pass
+
 
 class AOLParser(Parser):
     # Format of AOL: AnonID Query QueryTime ItemRank ClickURL
@@ -142,10 +151,11 @@ class AOLParser(Parser):
         value = record[2]
         print '%s\t%s'%(key, value)
 
-    # Input comes from either phase1 or phase2 output
-    # each line of phase1 output: key, tab, json object
-    # each line of phase2 output contains tab seperated fields:
-    # key, 
+    # Input comes from a number of files
+    # phase1 output: key, tab, json object
+    # entity linking + WPclick output contains tab seperated fields:
+    # key, entity type, query, intent part, entity, score, flag1, flag2
+    # 
     def map_phase3(self, record):
         record = list(record)
         # check from which file the record comes from
@@ -164,8 +174,9 @@ class AOLParser(Parser):
             } 
             print '%s\t%s'%(key, js.dumps(value))
 
-    # input is output of phase3, each line contains: counter, json object
-    # about a query, the goal of phase4 is to group the json objects
+
+    # input1 is output of phase4, each line contains: counter, json object
+    # about a query, the goal of phase5 is to group the json objects
     # by user id
     def map_phase4(self, record):
         counter, json = record
@@ -247,8 +258,9 @@ following logs: AOL, KB.')
                     help='Choose the processing phase (1, 2, 3, 4), default is 1.\n \
                     #phase 1: parse the log and extract information needed for the final format;\n \
                     #phase 2: parse the log and format it for entity linking;\n \
-                    #phase 3: collect results from phase 1 and 2, and format the final result;\n \
-                    #phase 4: group output from phase 3 with userid \
+                    #phase 3: collect results from phase 1, entity linking and WP stream, and format the final result;\n \
+ 
+                    #phase 4: group output from phase 4 with userid \
                     ')
 
     args = vars(argparser.parse_args())

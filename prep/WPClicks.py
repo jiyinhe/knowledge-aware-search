@@ -76,13 +76,17 @@ class WPClicks(object):
                 prob = float(counts)/totcount
                 print '%s\t%s\t%s'%(c2, counts, prob) 
         elif stats == 'tra':
+            # all starts from c1
             for c1, group in it.groupby(data, lambda x: x[0]):
                 group = list(group)
                 sum_c1 = sum([int(g[2]) for g in group]) 
-                entries = [{g[1]:[int(g[2]), float(g[2])/sum_c1]}
-                        for g in group
-                    ]
-                print '%s\t%s'%(c1, js.dumps(entries))
+                entries = []
+                for c2, group2 in it.groupby(group, lambda x: x[1]):
+                    # Need to further group by c2, as it may come from different files
+                    sum_c2 = sum([int(g[2]) for g in group2])
+                    entry = (c2,[sum_c2, float(sum_c2)/sum_c1])
+                    entries.append(entry)
+                print '%s\t%s'%(c1, js.dumps(dict(entries)))
  
 
 if __name__ == '__main__':
