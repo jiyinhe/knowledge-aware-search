@@ -34,10 +34,10 @@ class UserAnalyzer(object):
         # where key is the entities identified 
         self.c_et = {}
 
-    def run(self):
         # Sort the queries in time
         self.queries.sort(key=lambda x: datetime.strptime(x['qtime'], '%Y-%m-%d %H:%M:%S'))
 
+    def run(self):
         for i in range(len(self.queries)):
             # Check if a query is a new query
             self.check_newquery(i)
@@ -55,7 +55,7 @@ class UserAnalyzer(object):
                 self.change_of_entities(thisquery)
     
         # number of queries issued 
-        newqueries = list(it.ifilter(lambda x: x['newquery']==False, self.queries))
+        newqueries = list(it.ifilter(lambda x: x['not_newquery']==False, self.queries))
         # Among new queries, number of queries that are not direct urls
         noturls = list(it.ifilter(lambda x: x['is_url']==False, newqueries))
         # Among those, number of queries with entities above threshold -3
@@ -91,13 +91,18 @@ class UserAnalyzer(object):
 #        print
 
 
+    def get_annotated_queries(self):
+        return self.queries
+
     def check_newquery(self, idx):
         """ If consecutive queries are the same, we assume that is a pagination
              or rehit the search button rather than a new query"""
         # first query is not a pagination
-        self.queries[idx]['newquery'] = False
+        self.queries[idx]['not_newquery'] = False
         if idx > 0 and self.queries[idx]['qtext'] == self.queries[idx-1]['qtext']:
-            self.queries[idx]['newquery'] = True
+            self.queries[idx]['not_newquery'] = True
+
+        return self.queries[idx]['not_newquery']
 
     def check_url(self, idx):
         """
@@ -113,6 +118,7 @@ class UserAnalyzer(object):
         """ Threshold on entities """
         self.queries[idx]['entities'] = list(it.ifilter(lambda x: 
             x['score']>self.e_thresh, self.queries[idx]['entities']))
+        return self.queries[idx]['entities']
         
     def change_of_queries(self, query):
         """Find sequencies of queries that share the same words but are not
