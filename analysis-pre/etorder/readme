@@ -3,4 +3,18 @@ Purpose of analysis:
 
 Parameter setup:
 - threshold of entities in queries: -3
- 
+- filter out queries that are not new queries (e.g. pagination)
+- filter out the user that issued 200K+ queries (bot)
+
+statsQueryEt.py: 
+Examine stats of the entity pairs in query: 
+- frequency of the et pair in WPclickstream (if doesn't occur then count 0)
+- count of number of users own an et pair 
+
+filterEtPairs.py:
+check stats after filtering on:
+- number of users own a pair of entities
+- whether it occurs in WP
+
+Conclusions:
+ - number of users owning a entity pair is not important 

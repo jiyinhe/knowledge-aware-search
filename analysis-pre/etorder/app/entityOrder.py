@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-
 """
-It extract the order of entity mentions in queries 
+It extract the order of entity mentions in queries and computes:
+- the counts of entity pairs
+
+The counting is on every possible pairs n(n-1)/2
 
 Input log format: 
 {"uid": x, 
@@ -13,7 +15,7 @@ Input log format:
 "phase": x}
 
 Output format:
-entity1 entity2 count
+entity1 entity2 count_pair
 where entity1 is mentioned before entity2
 """
 import argparse
@@ -38,12 +40,15 @@ def map():
     for line in lines:
         u_history = js.loads(line)
         analyzer = ua.UserAnalyzer(u_history)
+        # filter out bot
+        if analyzer.check_bot():
+            continue
         i = 0
         prev_entities = []
         for q in u_history['queries']:
             # First check for queries that not new queries (e.g. from pagination)
-            notnewquery = analyzer.check_newquery(i)
-            if not notnewquery:
+            newquery = analyzer.check_newquery(i)
+            if newquery:
                 # Then check for entities
                 entities = analyzer.check_entities(i)
                 # process this query
@@ -60,7 +65,7 @@ def reduce():
         count = 0
         for g in group:
             count += 1
-        print '%s\t%s'%('\t'.join(key.split()), count)
+        print '%s\t%s'%(key, count)
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='This script extract the order of entity mentions in queries.')

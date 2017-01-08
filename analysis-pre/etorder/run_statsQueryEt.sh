@@ -9,16 +9,26 @@ if [[ $# -lt 1 ]]; then
 fi
 
 log=$1
-phase=$2
 
 CODEHOME=~/knowledge-aware-search/
-output_localdir=../../data/
+PROG=statsQueryEt
+
+output_localdir=${CODEHOME}/data/
 
 STREAM_DIR=~/hadoop-2.7.3/share/hadoop/tools/lib/
 
-input=tmp_output_${log}_phase4
-output=tmp_output_${log}_etorder
-output_local=${output_localdir}/output_${log}_etorder
+input1_local=${output_localdir}output_${log}_phase4
+input2_local=~/grid/tmp/wiki/clickstream
+
+input=tmp_input_${log}_${PROG}
+
+hdfs dfs -mkdir $input
+hdfs dfs -put $input1_local $input
+hdfs dfs -put $input2_local $input
+
+
+output=tmp_output_${log}_${PROG}
+output_local=${output_localdir}/output_${log}_${PROG}
 
 # first clean the outputdir if it exists
 hdfs dfs -rm -r $output
@@ -26,9 +36,9 @@ hdfs dfs -rm -r $output
 hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
 -D mapreduce.reduce.tasks=100 \
 -files app \
--mapper "app/entityOrder.py map" \
--reducer "app/entityOrder.py reduce" \
--input /user/he/$input -output /user/he/$output 
+-mapper "app/statsQueryEt.py map" \
+-reducer "app/statsQueryEt.py reduce" \
+-input /user/he/$input/*/* -output /user/he/$output 
 
 # get the results
 if [ -e $output_local ]; then

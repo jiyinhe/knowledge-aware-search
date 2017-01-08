@@ -12,7 +12,7 @@ log=$1
 phase=$2
 
 CODEHOME=~/knowledge-aware-search/
-output_localdir=../data/
+output_localdir=../../data/
 
 STREAM_DIR=~/hadoop-2.7.3/share/hadoop/tools/lib/
 
@@ -24,7 +24,7 @@ output_local=${output_localdir}/output_${log}_preanalysis_descstats
 hdfs dfs -rm -r $output
 
 hadoop jar $STREAM_DIR/hadoop-*streaming*.jar \
--D mapreduce.reduce.tasks=10 \
+-D mapreduce.reduce.tasks=100 \
 -files app \
 -mapper "app/descstats.py map" \
 -reducer "app/descstats.py reduce" \

@@ -37,6 +37,12 @@ class UserAnalyzer(object):
         # Sort the queries in time
         self.queries.sort(key=lambda x: datetime.strptime(x['qtime'], '%Y-%m-%d %H:%M:%S'))
 
+    def check_bot(self, thresh=100000):
+        if len(self.queries) > thresh:
+            return True
+        else:
+            return False
+
     def run(self):
         for i in range(len(self.queries)):
             # Check if a query is a new query
@@ -48,14 +54,14 @@ class UserAnalyzer(object):
 
             thisquery = self.queries[i]
             # Filter out non new queries and direct url input
-            if thisquery['newquery'] and (not thisquery['is_url']):
+            if thisquery['is_newquery'] and (not thisquery['is_url']):
                 # Test change of mind
                 self.change_of_queries(thisquery)            
                 self.change_of_clicks(thisquery)
                 self.change_of_entities(thisquery)
     
         # number of queries issued 
-        newqueries = list(it.ifilter(lambda x: x['not_newquery']==False, self.queries))
+        newqueries = list(it.ifilter(lambda x: x['is_newquery']==True, self.queries))
         # Among new queries, number of queries that are not direct urls
         noturls = list(it.ifilter(lambda x: x['is_url']==False, newqueries))
         # Among those, number of queries with entities above threshold -3
@@ -98,11 +104,11 @@ class UserAnalyzer(object):
         """ If consecutive queries are the same, we assume that is a pagination
              or rehit the search button rather than a new query"""
         # first query is not a pagination
-        self.queries[idx]['not_newquery'] = False
+        self.queries[idx]['is_newquery'] = True
         if idx > 0 and self.queries[idx]['qtext'] == self.queries[idx-1]['qtext']:
-            self.queries[idx]['not_newquery'] = True
+            self.queries[idx]['is_newquery'] = False
 
-        return self.queries[idx]['not_newquery']
+        return self.queries[idx]['is_newquery']
 
     def check_url(self, idx):
         """

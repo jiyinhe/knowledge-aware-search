@@ -3,12 +3,12 @@ make plots from the descriptive statistics
 """
 import simplejson as js
 import os
-import pylab
+#import pylab
 import numpy as np
 import itertools as it
 from scipy.stats import ranksums
 
-inputdir='../data/output_AOL_preanalysis_descstats/'
+inputdir='../../data/output_AOL_preanalysis_descstats/'
 
 keys = ["#change_q", "#w_et", "#w_click","#change_e","#change_c", "#q", "#not_urls"]
 def load_data(inputdir):
@@ -33,6 +33,14 @@ def load_data(inputdir):
 def filter_data(data): 
     print 
     print "Total number of users:", len(data)
+
+    num_q = sorted([x['#q'] for x in data], reverse=True)
+    print 'Number of queries per user:'
+    print 'Max: %s'%max(num_q), 
+    print 'Min: %s'%min(num_q),
+    print 'Top 10: ', num_q[0:10]
+    
+
     # users should have at least 2 new queries
     thresh = 2  
     data = list(it.ifilter(lambda x: x['#q'] >= thresh, data))

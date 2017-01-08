@@ -18,18 +18,22 @@ def read_input(file):
         
 def read_mapper_output(file, delimiter='\t'):
     for line in file:
-         yield line.strip().rsplit(delimiter, 1)
-
+        yield line.rstrip().split('\t')
 
 def map():
     records = read_input(sys.stdin)
+    i = 0
     for record in records:
         #print record
         data = js.loads(record)
         key = data['uid']
         analyser = ua.UserAnalyzer(data)
+        if analyser.check_bot():
+            continue
         res = analyser.run()
-        print 'key\t%s'%(js.dumps(res))
+        res['uid'] = key
+        print '%s\t%s'%(i, js.dumps(res))
+        i += 1
 
 def reduce():
     data = read_mapper_output(sys.stdin)
